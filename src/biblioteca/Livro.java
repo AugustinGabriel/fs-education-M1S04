@@ -8,7 +8,7 @@ public class Livro {
     public String autor; // TODO Criar classe Autor
     public String genero;
     public String edicao;
-    public String idioma;
+    public String idioma = "pt-BR";
     public int volume = 0;
     public int anoPublicacao;
     public int numeroPaginas;
@@ -16,7 +16,7 @@ public class Livro {
     public String editora;
     public String localicacao;
     public LivroStatus statusAtual = LivroStatus.BLOQUEADO;
-    public int numeroExemplar;
+    public int numeroExemplar = 1;
     public String isbn;
 
     public void danificar() {
@@ -44,6 +44,15 @@ public class Livro {
         }
     }
 
+    public void devolver() {
+        if (statusAtual.equals(LivroStatus.EMPRESTADO)) {
+            statusAtual = LivroStatus.DISPONIVEL;
+            System.out.println("O Livro devolvido");
+        } else {
+            System.out.println("O Livro está " + statusAtual +  ". Não pode ser devolvido!");
+        }
+    }
+
     private boolean podeEmpretar() {
         return statusAtual.equals(LivroStatus.DISPONIVEL) ||
                statusAtual.equals(LivroStatus.RESERVADO);
@@ -51,6 +60,10 @@ public class Livro {
 
     public void enderecar(String endereco) {
         localicacao = endereco;
+    }
+
+    public void disponibilizar() {
+        statusAtual = LivroStatus.DISPONIVEL;
     }
 
 }
