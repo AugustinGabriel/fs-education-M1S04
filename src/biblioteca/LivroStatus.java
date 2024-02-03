@@ -5,8 +5,10 @@ public enum LivroStatus {
     DISPONIVEL,
     EMPRESTADO,
     RESERVADO,
-    BLOQUEADO,
+    BLOQUEADO_EMPRESTIMO,
     PERDIDO,
-    ESTRAGADO
+    MANUTENCAO,
+    REPARAR,
+    DESCARTAVEL
 
 }

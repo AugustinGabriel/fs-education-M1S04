@@ -1,12 +1,14 @@
 package biblioteca;
 
+import util.StringUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Scanner scn = new Scanner(System.in);
         List<Livro> acervo = new ArrayList<>();
 
@@ -15,49 +17,91 @@ public class Main {
         System.out.println("*************\n");
 
         do {
-            System.out.println("+----------------------+");
-            System.out.println("| 1 - Consultar acervo |");
-            System.out.println("| 2 - Cadastrar livro  |");
-            System.out.println("| 3 - Editar livro     |");
-            System.out.println("| 4 - Remover livro    |");
-            System.out.println("+----------------------+");
-            System.out.println("| 0 - Sair             |");
-            System.out.println("+----------------------+");
-            System.out.print  ("Selecione uma opção: "   );
+            System.out.println("+------------------------+");
+            System.out.println("| 1 - Consultar acervo   |");
+            System.out.println("| 2 - Detalhes do livro  |");
+            System.out.println("| 3 - Cadastrar livro    |");
+            System.out.println("| 4 - Editar livro       |");
+            System.out.println("| 5 - Remover livro      |");
+            System.out.println("+------------------------+");
+            System.out.println("| 0 - Sair               |");
+            System.out.println("+------------------------+");
+            System.out.print  ("Selecione uma opção: "     );
             int opcao = nextInt(scn);
 
+            // TODO Exibir todos os dados de um livro
             switch (opcao) {
                 case 1: // Consultar
                     exibirAcervo(acervo);
                     break;
-                case 2: // Cadastrar
+                case 2: // Detalhes do livro encontrado pelo id
+                    buscarLivro(scn, acervo);
+                    break;
+                case 3: // Cadastrar
                     cadastrarLivro(scn, acervo);
                     break;
-                case 3: // Editar
-                    exibirAcervo(acervo);
-                    System.out.print("Informe o número do livro para a sua edição: ");
-                    int indice = nextInt(scn);
-                    Livro livro = acervo.get(indice);
-                    inserirDadosLivro(scn, livro);
-                    System.out.println("Livro "+ livro.titulo + " editado!");
+                case 4: // Editar
+                    editarLivro(scn, acervo);
                     break;
-                case 4: // Remover
+                case 5: // Remover
+                    removerLivro(scn, acervo);
                     break;
                 case 0: // Sair
                     return;
             }
 
-            System.out.println("Pressione [ENTER] para continuar");
-            scn.nextLine();
+            // Aguarda 2 segundas
+            Thread.sleep(2000);
+//            System.out.println("Pressione [ENTER] para continuar");
+//            scn.nextLine();
 
             limparTela();
         } while (true);
 
     }
 
+    private static void buscarLivro(Scanner entrada, List<Livro> acervo) {
+        Livro livro = pedirLivro(entrada, acervo);
+        System.out.print(StringUtil.testaCampo("ID", livro.getId()));
+        System.out.print(StringUtil.testaCampo("Título", livro.titulo));
+        System.out.print(StringUtil.testaCampo("Subtítulo", livro.subtitulo));
+        System.out.print(StringUtil.testaCampo("Descrição", livro.descricao));
+        System.out.print(StringUtil.testaCampo("Autor", livro.autor));
+        System.out.print(StringUtil.testaCampo("Gênero", livro.genero));
+        System.out.print(StringUtil.testaCampo("Edição", livro.edicao));
+        System.out.print(StringUtil.testaCampo("Idioma", livro.idioma));
+        System.out.print(StringUtil.testaCampo("Volume", livro.volume));
+    }
+
+    private static Livro pedirLivro(Scanner entrada, List<Livro> acervo) {
+        do {
+            exibirAcervo(acervo);
+            System.out.print("Digite o ID do livro escolhido: ");
+            int idEscolhido = nextInt(entrada);
+            for (Livro livro : acervo) {
+                if (idEscolhido == livro.getId()) {
+                    return livro;
+                }
+            }
+            System.out.println("Livro não encontrado. Tente novamente!");
+        } while (true);
+    }
+
+    private static void removerLivro(Scanner entrada, List<Livro> acervo) {
+        Livro livro = pedirLivro(entrada, acervo);
+        acervo.remove(livro);
+        System.out.println("O livro \"" + livro.titulo + "\" foi removido com sucesso!");
+    }
+
+    private static void editarLivro(Scanner entrada, List<Livro> acervo) {
+        Livro livro = pedirLivro(entrada, acervo);
+        inserirDadosLivro(entrada, livro);
+        System.out.println("Livro \""+ livro.titulo + "\" editado com sucesso absoluto!");
+    }
+
     private static void exibirAcervo(List<Livro> acervo) {
-        for (int i = 0; i < acervo.size(); i++) {
-            System.out.println(i + " - " + acervo.get(i).titulo);
+        for (Livro livro : acervo) {
+            System.out.println(livro.getId() + " - " + livro.titulo);
         }
     }
 
@@ -117,6 +161,27 @@ public class Main {
         System.out.println("ISBN: " + livro.isbn);
         System.out.print("Digite: ");
         livro.isbn = entrada.nextLine();
+
+        System.out.println("Estado de conservação: " + livro.getPcConservacao());
+        do {
+            System.out.println("Escolha uma opção:");
+            System.out.println("1 - Novo (100%)");
+            System.out.println("2 - Excelente (80%)");
+            System.out.println("3 - Bom (60%)");
+            System.out.println("4 - Ruim (40%)");
+            System.out.println("5 - Péssimo (20%)");
+            System.out.print("Digite: ");
+            int opcConservacao = entrada.nextInt();
+
+            if (opcConservacao < 0 || opcConservacao > 5) {
+                System.out.println("Opção inválida. Tente novamente!");
+                continue;
+            }
+
+            int percent = 100 - (20 * (opcConservacao - 1));
+            livro.setPcConservacao(percent);
+            break;
+        } while (true);
 
         return livro;
     }
